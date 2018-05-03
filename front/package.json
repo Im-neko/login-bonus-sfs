@@ -1,0 +1,31 @@
+{
+  "name": "voicer_cms",
+  "version": "0.1.0",
+  "homepage": "https://foritsjp.github.io/voicer_cms/",
+  "private": true,
+  "dependencies": {
+    "firebaseui": "^2.7.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "1.1.1",
+    "sha256": "^0.2.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start:prod": "NODE_ENV=development react-scripts start",
+    "start:dev": "NODE_ENV=production react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && gh-pages -d build"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.0",
+    "envify": "^4.1.0",
+    "exorcist": "^1.0.1",
+    "gh-pages": "^1.1.0",
+    "watchify": "^3.11.0"
+  }
+}
