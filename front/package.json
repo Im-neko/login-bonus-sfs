@@ -1,7 +1,7 @@
 {
-  "name": "voicer_cms",
+  "name": "login-bonus-sfs",
   "version": "0.1.0",
-  "homepage": "https://foritsjp.github.io/voicer_cms/",
+  "homepage": "https://sfc.login-ranking.work",
   "private": true,
   "dependencies": {
     "firebaseui": "^2.7.0",

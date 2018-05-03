@@ -3,12 +3,7 @@ import Ranking from "./Ranking";
 
 
 export default class extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-
-  render () {
+render () {
     return (
       <div className="Tabs">
         <Ranking />

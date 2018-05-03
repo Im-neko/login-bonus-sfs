@@ -20,7 +20,7 @@ export default class extends Component {
         return 0;
       });
       for (var i in data) {
-        list.push(<tr><th>{parseInt(i)+1}</th><th>{data[i].max_count}</th><th>{data[i].username}</th></tr>);
+        list.push(<tr key={parseInt(i, 10)} ><th>{parseInt(i, 10)+1}</th><th>{data[i].max_count}</th><th>{data[i].username}</th></tr>);
       }
       this.setState({datas: list});
     });

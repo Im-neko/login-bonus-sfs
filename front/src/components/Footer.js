@@ -13,7 +13,7 @@ export default class extends Component {
     return (
       <div id="footer" style={style}>
         <div className="siimple-footer siimple-footer--teal siimple-footer--fluid" align="center"> <br />
-          Copyright © 2018 Im-neko.net All Rights Reserved.<br /><br />
+          Copyright © 2018- All Rights Reserved by 〇〇.<br /><br />
           Powered by neko
         </div>
       </div>

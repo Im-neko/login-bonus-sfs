@@ -84,7 +84,7 @@ main = async () => {
           await popup(data);
         }
         // debug用
-        clearStorage();
+        //clearStorage();
         console.log("clear")
       } else {
         console.error(date);

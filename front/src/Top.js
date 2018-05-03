@@ -5,12 +5,8 @@ import Footer from "./components/Footer";
 
 
 
-export default class Top extends Component {
-  constructor (props) {
-    super(props);
-  }
-
-  render () {
+class Top extends Component {
+render () {
     return (
       <div>
         <center>
@@ -22,3 +18,5 @@ export default class Top extends Component {
     );
   }
 }
+
+export default Top;
