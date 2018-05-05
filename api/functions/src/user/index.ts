@@ -53,7 +53,7 @@ const handlePUT = async (req, res) => { // {{{
     const idToken = req.body.idToken;
     let db = admin.firestore();
     let aUserRef = await db.doc('users/'+idToken);
-    let setUser = await aUserRef.set({ // {{{
+    let setUser = await aUserRef.update({ // {{{
       schoolId: req.bcody.schoolId,
       idToken: req.body.idToken,
       username: req.body.username,
