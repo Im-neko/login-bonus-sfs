@@ -14,6 +14,12 @@ export default class extends Component {
     let list = [];
     axios.get(apis.ranking_url+'?type=all').then((res) => {
       let data = res.data.data;
+      data = data.map((data) => {
+        let num = parseInt(data.last_login, 10);
+        data.last_login = new Date(num)+'';
+        return data;
+      })
+      console.log(data)
       data.sort(function(a,b){
         if(a.max_count > b.max_count) return -1;
         if(a.max_count < b.max_count) return 1;
