@@ -1,6 +1,9 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin'
 
+import * as cors from 'cors';
+const corsHandler = cors({origin: true});
+
 
 const handleGET = async (req, res) => { // {{{
   // Do something with the GET request
@@ -12,10 +15,10 @@ const handleGET = async (req, res) => { // {{{
     * snapshot.forEach((doc) => { });
     * なんか挙動が違くて動かない
     */
-    const id = req.query['id'];
+    const schoolId = req.query['schoolId'];
     let data = [];
-    if (id) {
-      let aUserRef = await db.doc('users/'+id);
+    if (schoolId) {
+      let aUserRef = await db.doc('users/'+schoolId);
       aUserRef.get().then((snapshot) => {
         if (snapshot.exists) {
           let d = {};
@@ -50,15 +53,13 @@ const handleGET = async (req, res) => { // {{{
 const handlePUT = async (req, res) => { // {{{
   // Do something with the PUT request
   try{
-    const idToken = req.body.idToken;
+    const schoolId = req.body.schoolId;
     let db = admin.firestore();
-    let aUserRef = await db.doc('users/'+idToken);
+    let aUserRef = await db.doc('users/'+schoolId);
     let setUser = await aUserRef.update({ // {{{
-      schoolId: req.bcody.schoolId,
-      idToken: req.body.idToken,
-      username: req.body.username,
       max_count: req.body.max_count,
-      now_count: req.body.now_count
+      now_count: req.body.now_count,
+      last_login: req.body.last_login
     }); // }}}
     /*
     // {{{
@@ -99,35 +100,40 @@ const handlePUT = async (req, res) => { // {{{
 const handlePOST = async (req, res) => { // {{{
   // Do something with the POST request
   try{
-    const idToken = req.body.idToken;
+    const schoolId = req.body.schoolId;
     let db = admin.firestore();
-    let aUserRef =  await db.doc('users/'+idToken);
+    let aUserRef =  await db.doc('users/'+schoolId);
     let setUser = await aUserRef.set({ // {{{
       schoolId: req.body.schoolId,
       idToken: req.body.idToken,
       username: req.body.username,
       max_count: req.body.max_count,
-      now_count: req.body.now_count
+      now_count: req.body.now_count,
+      last_login: req.body.last_login
     }); // }}}
     res.status(200).json({message: 'success', error: null})
   } catch(e) {
+    console.log(req.body)
+    console.error(e)
     res.status(500).json({message: 'Internal Server Error', error: 500});
   }
 } // }}}
 
 export const userController = functions.https.onRequest(async (req, res) => { // {{{
-  res.set('Access-Control-Allow-Origin', "*");
-  switch (req.method) {
-    case 'GET':
-      await handleGET(req, res);
-      break;
-    case 'PUT':
-      await handlePUT(req, res);
-      break;
-    case 'POST':
-      await handlePOST(req, res);
-    default:
-      res.status(500).json({ error: 'Something blew up!' });
-      break;
-  }
+  corsHandler(req, res, async () => {
+    switch (req.method) {
+      case 'GET':
+        await handleGET(req, res);
+        break;
+      case 'PUT':
+        await handlePUT(req, res);
+        break;
+      case 'POST':
+        await handlePOST(req, res);
+        break;
+      default:
+        res.status(500).json({ error: 'somethong brew up' });
+        break;
+    }
+  });
 }); // }}}

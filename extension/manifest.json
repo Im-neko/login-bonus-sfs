@@ -7,7 +7,7 @@
       {
         "matches": ["https://vu.sfc.keio.ac.jp/sfc-sfs/portal_s/s01.cgi?*&mode=0"],
         "css": ["css/mystyle.css"],
-        "js": ["js/myscript.js", "js/src/sha256.js"]
+        "js": ["js/myscript.js"]
       }
     ],
     "browser_action": {

@@ -1,6 +1,8 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin'
 
+import * as cors from 'cors';
+const corsHandler = cors({origin: true});
 
 const aUserRank = async (req, res) => { // {{{
   let db = admin.firestore();
@@ -127,18 +129,20 @@ const handlePOST = async (req, res) => { // {{{
 } // }}}
 
 export const rankingController = functions.https.onRequest(async (req, res) => { // {{{
-  res.set('Access-Control-Allow-Origin', "*");
-  switch (req.method) {
-    case 'GET':
-      await handleGET(req, res);
-      break;
-    case 'PUT':
-      await handlePUT(req, res);
-      break;
-    case 'POST':
-      await handlePOST(req, res);
-    default:
-      res.status(500).json({ error: 'Something blew up!' });
-      break;
-  }
+  corsHandler(req, res, async () => {
+    switch (req.method) {
+      case 'GET':
+        await handleGET(req, res);
+        break;
+      case 'PUT':
+        await handlePUT(req, res);
+        break;
+      case 'POST':
+        await handlePOST(req, res);
+        break;
+      default:
+        res.status(500).json({ error: 'somethong brew up' });
+        break;
+    }
+  });
 }); // }}}

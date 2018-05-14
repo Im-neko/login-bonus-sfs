@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const cors = require("cors");
+const corsHandler = cors({ origin: true });
 const handleGET = (req, res) => __awaiter(this, void 0, void 0, function* () {
     // Do something with the GET request
     try {
@@ -19,10 +21,10 @@ const handleGET = (req, res) => __awaiter(this, void 0, void 0, function* () {
         * snapshot.forEach((doc) => { });
         * なんか挙動が違くて動かない
         */
-        const id = req.query['id'];
+        const schoolId = req.query['schoolId'];
         let data = [];
-        if (id) {
-            let aUserRef = yield db.doc('users/' + id);
+        if (schoolId) {
+            let aUserRef = yield db.doc('users/' + schoolId);
             aUserRef.get().then((snapshot) => {
                 if (snapshot.exists) {
                     let d = {};
@@ -59,15 +61,13 @@ const handleGET = (req, res) => __awaiter(this, void 0, void 0, function* () {
 const handlePUT = (req, res) => __awaiter(this, void 0, void 0, function* () {
     // Do something with the PUT request
     try {
-        const idToken = req.body.idToken;
+        const schoolId = req.body.schoolId;
         let db = admin.firestore();
-        let aUserRef = yield db.doc('users/' + idToken);
-        let setUser = yield aUserRef.set({
-            schoolId: req.bcody.schoolId,
-            idToken: req.body.idToken,
-            username: req.body.username,
+        let aUserRef = yield db.doc('users/' + schoolId);
+        let setUser = yield aUserRef.update({
             max_count: req.body.max_count,
-            now_count: req.body.now_count
+            now_count: req.body.now_count,
+            last_login: req.body.last_login
         }); // }}}
         /*
         // {{{
@@ -108,36 +108,41 @@ const handlePUT = (req, res) => __awaiter(this, void 0, void 0, function* () {
 const handlePOST = (req, res) => __awaiter(this, void 0, void 0, function* () {
     // Do something with the POST request
     try {
-        const idToken = req.body.idToken;
+        const schoolId = req.body.schoolId;
         let db = admin.firestore();
-        let aUserRef = yield db.doc('users/' + idToken);
+        let aUserRef = yield db.doc('users/' + schoolId);
         let setUser = yield aUserRef.set({
             schoolId: req.body.schoolId,
             idToken: req.body.idToken,
             username: req.body.username,
             max_count: req.body.max_count,
-            now_count: req.body.now_count
+            now_count: req.body.now_count,
+            last_login: req.body.last_login
         }); // }}}
         res.status(200).json({ message: 'success', error: null });
     }
     catch (e) {
+        console.log(req.body);
+        console.error(e);
         res.status(500).json({ message: 'Internal Server Error', error: 500 });
     }
 }); // }}}
 exports.userController = functions.https.onRequest((req, res) => __awaiter(this, void 0, void 0, function* () {
-    res.set('Access-Control-Allow-Origin', "*");
-    switch (req.method) {
-        case 'GET':
-            yield handleGET(req, res);
-            break;
-        case 'PUT':
-            yield handlePUT(req, res);
-            break;
-        case 'POST':
-            yield handlePOST(req, res);
-        default:
-            res.status(500).json({ error: 'Something blew up!' });
-            break;
-    }
+    corsHandler(req, res, () => __awaiter(this, void 0, void 0, function* () {
+        switch (req.method) {
+            case 'GET':
+                yield handleGET(req, res);
+                break;
+            case 'PUT':
+                yield handlePUT(req, res);
+                break;
+            case 'POST':
+                yield handlePOST(req, res);
+                break;
+            default:
+                res.status(500).json({ error: 'somethong brew up' });
+                break;
+        }
+    }));
 })); // }}}
 //# sourceMappingURL=index.js.map

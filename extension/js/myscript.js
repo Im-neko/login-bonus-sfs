@@ -41,20 +41,39 @@ check_login = async (data, date) => {
   }
 }
 
-post_count = async () => {
+post_count = async (max_count, now_count, last_login) => {
   var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function(){
-      if (this.readyState==4 && this.status==200) {
-          // responseをhogehogeする
-      }
-  };
   xhr.responseType = 'json';
-  xhr.open('GET',endpoint,true);
-  xhr.send();
+  xhr.open('PUT', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi');
+  xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+  xhr.send('max_count'+max_count+'now_count='+now_count+'last_login='+last_login);
+  xhr.onreadystatechange = async function() {
+    if(xhr.readyState === 4 && xhr.status === 200) {
+      let res = xhr.response;
+      console.log(res);
+    }
+  }
 }
 
-message = async () => {
-  alert("現在連続ログイン日目です！");
+get_status = async (hash) => {
+  console.log(hash)
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'json';
+  await xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi?schoolId='+hash);
+  await xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+  xhr.onreadystatechange = function() {
+    if(xhr.readyState === 4 && xhr.status === 200) {
+      let res = xhr.response;
+      console.log(res);
+      if(res.data){
+        console.log(true)
+        return true;
+      }else{
+        console.log(false)
+        return false;
+      }
+    }
+  }
 }
 
 sha256 = async (text) => {
@@ -94,28 +113,11 @@ getByXpath = (path) => {
   return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
-scripts = () => {
-  var script1 = document.createElement('script');
-  script1.src = 'https://www.gstatic.com/firebasejs/4.13.0/firebase.js';
-  document.body.appendChild(script1);
-  var script2 = document.createElement('script');
-  script2.src = 'https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js';
-  document.body.appendChild(script2);
-  var script3 = document.createElement('link');
-  script3.type="text/css";
-  script3.rel="stylesheet";
-  script3.href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css";
-  document.body.appendChild(script3);
-  var script4 = document.createElement('script');
-  script4.src = 'https://im-neko.net/sfc/popup.js';
-  document.body.appendChild(script4);
-}
-
-join_rank = () => {
+join_rank = (hash, max_count, now_count, last_login) => {
   let html = document.getElementById('navigation').innerHTML;
   html = '\
   <div class="rnavi01"> \
-  <a href="" onClick="twiAuth()"> 連続ログインランキング戦に参加する </a>\
+  <a href="https://sfc.login-ranking.work/#/login?hash='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login+'" target="_blank"> 連続ログインランキング戦に参加する </a>\
   </div> \
   <br> \
   ' + html;
@@ -148,12 +150,11 @@ popup = (data) => {
 }
 
 main = async () => {
-  scripts();
-  join_rank();
+  let data = {max_count: 0, now_count: 0, last_login: 0}
   let info = getByXpath('/html/body/table[1]/tbody/tr/td[2]/text()');
   const schoolId = info.data.split(' ')[3];
 
-  hash = await chrome.storage.local.get(['hash'], async (r) => {
+  let hash = await chrome.storage.local.get(['hash'], async (r) => {
     if (r.hash) {
       console.log('hash exist', r.hash);
       hash = r.hash;
@@ -168,12 +169,8 @@ main = async () => {
   * ほんまjavascript嫌い
   */
 
-  console.log('hash', hash);
-
   let date = new Date();
   date = date.getTime();
-
-  let data = {}
 
   data = await chrome.storage.local.get(['data'], async (r) => {
     if (r.data) {
@@ -187,7 +184,12 @@ main = async () => {
       data = data;
     }
 
-    data = await check_login(data, date);
+    data = await check_login(data, date)
+    join_rank(hash, data.max_count, data.now_count, data.last_login);
+    let status_flag = await get_status(hash);
+    if (status_flag) {
+      post_count(hash)
+    }
 
     await chrome.storage.local.set({data: data}, async (e) => {
       if (!e) {

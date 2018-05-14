@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const cors = require("cors");
+const corsHandler = cors({ origin: true });
 const aUserRank = (req, res) => __awaiter(this, void 0, void 0, function* () {
     let db = admin.firestore();
     let aRankRef = yield db.doc('users/' + req.query.id);
@@ -132,19 +134,21 @@ const handlePOST = (req, res) => __awaiter(this, void 0, void 0, function* () {
     }
 }); // }}}
 exports.rankingController = functions.https.onRequest((req, res) => __awaiter(this, void 0, void 0, function* () {
-    res.set('Access-Control-Allow-Origin', "*");
-    switch (req.method) {
-        case 'GET':
-            yield handleGET(req, res);
-            break;
-        case 'PUT':
-            yield handlePUT(req, res);
-            break;
-        case 'POST':
-            yield handlePOST(req, res);
-        default:
-            res.status(500).json({ error: 'Something blew up!' });
-            break;
-    }
+    corsHandler(req, res, () => __awaiter(this, void 0, void 0, function* () {
+        switch (req.method) {
+            case 'GET':
+                yield handleGET(req, res);
+                break;
+            case 'PUT':
+                yield handlePUT(req, res);
+                break;
+            case 'POST':
+                yield handlePOST(req, res);
+                break;
+            default:
+                res.status(500).json({ error: 'somethong brew up' });
+                break;
+        }
+    }));
 })); // }}}
 //# sourceMappingURL=index.js.map

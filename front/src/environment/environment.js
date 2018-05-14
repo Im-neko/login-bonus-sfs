@@ -1,5 +1,7 @@
-if (process.env.NODE_ENV === 'development') {
-  exports.api_url = 'http://localhost:5000/sfs-login-bonus/us-central1/rankingapi'
+if (process.env.ENV === 'dev') {
+  exports.ranking_url = 'http://localhost:5000/sfs-login-bonus/us-central1/rankingapi';
+  exports.post_user_url = 'http://localhost:5000/sfs-login-bonus/us-central1/userapi';
 }else{
-  exports.api_url = 'https://us-central1-sfs-login-bonus.cloudfunctions.net/rankingapi'
+  exports.ranking_url = 'https://us-central1-sfs-login-bonus.cloudfunctions.net/rankingapi';
+  exports.post_user_url = 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi';
 }

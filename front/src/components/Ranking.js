@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from 'axios';
 
-import api_url from "../environment/environment";
+import * as apis from "../environment/environment";
 
 
 export default class extends Component {
@@ -12,7 +12,7 @@ export default class extends Component {
 
   componentWillMount () {
     let list = [];
-    axios.get(api_url.api_url+'?type=all').then((res) => {
+    axios.get(apis.ranking_url+'?type=all').then((res) => {
       let data = res.data.data;
       data.sort(function(a,b){
         if(a.max_count > b.max_count) return -1;
@@ -20,7 +20,7 @@ export default class extends Component {
         return 0;
       });
       for (var i in data) {
-        list.push(<tr key={parseInt(i, 10)} ><th>{parseInt(i, 10)+1}</th><th>{data[i].max_count}</th><th>{data[i].username}</th></tr>);
+        list.push(<tr key={parseInt(i, 10)} ><th>{parseInt(i, 10)+1}</th><th>{data[i].max_count}</th><th>{data[i].username}</th><th>{data[i].last_login}</th></tr>);
       }
       this.setState({datas: list});
     });
