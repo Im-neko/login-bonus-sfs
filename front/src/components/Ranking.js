@@ -36,6 +36,7 @@ export default class extends Component {
           <th>Rank</th>
           <th>Count</th>
           <th>UserName</th>
+          <th>LastLoginTime</th>
         </tr>
         {this.state.datas}
       </tbody>
