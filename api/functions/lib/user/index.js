@@ -61,6 +61,7 @@ const handleGET = (req, res) => __awaiter(this, void 0, void 0, function* () {
 const handlePUT = (req, res) => __awaiter(this, void 0, void 0, function* () {
     // Do something with the PUT request
     try {
+        console.log(req);
         const schoolId = req.body.schoolId;
         let db = admin.firestore();
         let aUserRef = yield db.doc('users/' + schoolId);
@@ -69,39 +70,10 @@ const handlePUT = (req, res) => __awaiter(this, void 0, void 0, function* () {
             now_count: req.body.now_count,
             last_login: req.body.last_login
         }); // }}}
-        /*
-        // {{{
-        let date = new Date.getTime();
-    
-        let allRef = firestore.collection('ranking-all');
-        let weekRef = firestore.doc('ranking-week/'+idToken);
-        let monthRef = firestore.doc('ranking-month/'+idToken);
-        let setAll = await allRef.set({ // {{{
-          schoolId: req.body.schoolId,
-          idToken: req.body.idToken,
-          username: req.body.username,
-          max_count: req.body.max_count,
-          now_count: req.body.now_count
-        }); // }}}
-        let setWeek = await WeekRef.set({ // {{{
-          schoolId: req.body.schoolId,
-          idToken: req.body.idToken,
-          username: req.body.username,
-          max_count: req.body.max_count,
-          now_count: req.body.now_count
-        }); // }}}
-        let setMonth = await MonthRef.set({ // {{{
-          schoolId: req.body.schoolId,
-          idToken: req.body.idToken,
-          username: req.body.username,
-          max_count: req.body.max_count,
-          now_count: req.body.now_count
-        }); // }}}
-        // }}}
-        */
         res.status(200).json({ message: 'success', data: null, error: null });
     }
     catch (e) {
+        console.log(e);
         res.status(500).json({ message: 'Internal Server Error', data: null, error: 500 });
     }
 }); // }}}

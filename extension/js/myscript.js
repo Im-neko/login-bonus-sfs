@@ -1,4 +1,4 @@
-getday0000 = async (date) => {
+getday0000 = (date) => {
   date = new Date(date);
   date.setHours(0);
   date.setMinutes(0);
@@ -7,106 +7,165 @@ getday0000 = async (date) => {
   return date;
 }
 
-clearStorage = async () => {
-  return await chrome.storage.local.clear(function (r) {
-    console.log("clear storage", r);
+sha256 = (text) => {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/sha256api', false);
+    xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    xhr.send( 'text='+text );
+    if(xhr.status == 200) {
+      let res = JSON.parse(xhr.response);
+      let hash = res.data;
+      debug?console.log('sha256 hash: ', hash):null
+       chrome.storage.local.set({hash: hash},  (e) => {
+        e? reject("setting error") : resolve(hash);
+      });
+    }else{
+      reject("not found");
+    }
+  });
+}
+
+clearStorage = () => {
+  return chrome.storage.local.clear(function (r) {
+    debug?console.log("clear storage"):null
   })
 }
 
-check_login = async (data, date) => {
-  let lastLoginDay = await getday0000(data.last_login);
-  let gap = date - lastLoginDay;
-  // 二回目以降のログイン
-  if (gap < 24*60*60*1000) {
-    todaylogin = true;
-    if (date === data.last_login) {todaylogin = false;}
-    data.last_login = date;
-    return data;
-  // 2日以上あいた場合
-  } else if (gap > 2*24*60*60*1000) {
-    data.now_count = 1;
-    data.last_login = date;
-    return data;
-  // 連続ログイン
-  } else if (gap > 24*60*60*1000){
-    data.now_count += 1;
-    data.last_login = date;
-    if (data.now_count > data.max_count) {
-      data.max_count += 1;
-    }
-    return data;
-  }else{
-    console.error("date",date);
-    console.error("data",data);
-  }
-}
-
-post_count = async (max_count, now_count, last_login) => {
-  var xhr = new XMLHttpRequest();
-  xhr.responseType = 'json';
-  xhr.open('PUT', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi');
-  xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-  xhr.send('max_count'+max_count+'now_count='+now_count+'last_login='+last_login);
-  xhr.onreadystatechange = async function() {
-    if(xhr.readyState === 4 && xhr.status === 200) {
-      let res = xhr.response;
-      console.log(res);
-    }
-  }
-}
-
-get_status = async (hash) => {
-  console.log(hash)
-  var xhr = new XMLHttpRequest();
-  xhr.responseType = 'json';
-  await xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi?schoolId='+hash);
-  await xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-  xhr.onreadystatechange = function() {
-    if(xhr.readyState === 4 && xhr.status === 200) {
-      let res = xhr.response;
-      console.log(res);
-      if(res.data){
-        console.log(true)
-        return true;
-      }else{
-        console.log(false)
-        return false;
+check_login = (data, date) => {
+  return new Promise((resolve, reject) => {
+    let lastLoginDay = getday0000(data.last_login);
+    let gap = date - lastLoginDay;
+    // 二回目以降のログイン
+    if (gap < 24*60*60*1000) {
+      todaylogin = true;
+      if (date === data.last_login) {todaylogin = false;}
+      data.last_login = date;
+      debug?console.log('already yet'):null
+      resolve(data);
+    // 2日以上あいた場合
+    } else if (gap > 2*24*60*60*1000) {
+      data.now_count = 1;
+      data.last_login = date;
+      debug?console.log('reset count'):null
+      resolve(data);
+    // 連続ログイン
+    } else if (gap > 24*60*60*1000){
+      data.now_count += 1;
+      data.last_login = date;
+      if (data.now_count > data.max_count) {
+        data.max_count += 1;
       }
+      debug?console.log('increment count'):null
+      resolve(data);
+    }else{
+      debug?console.error("date",date):null
+      debug?console.error("data",data):null
     }
-  }
+  });
 }
 
-sha256 = async (text) => {
-  var xhr = new XMLHttpRequest();
-  xhr.responseType = 'json';
-  xhr.open('POST', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/sha256api');
-  xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
-  xhr.send( 'text='+text )
-  xhr.onreadystatechange = async function() {
-    if(xhr.readyState === 4 && xhr.status === 200) {
-      let res = xhr.response;
-      let hash = res.data;
-      await chrome.storage.local.set({hash: hash}, async (e) => {
-        if (!e) {
-          return hash;
-        } else {
-          return -1
+put_count = (hash, max_count, now_count, last_login) => {
+  return new Promise((resolve, reject) => {
+    console.log(hash,max_count,now_count,last_login)
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi', false);
+    xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    xhr.send( 'schoolId='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login );
+    if (xhr.status == 200){
+      let res = JSON.parse(xhr.response);
+      resolve(res);
+    } else {
+      reject("failed to put");
+    }
+  });
+}
+
+get_status = (hash) => {
+  return new Promise((resolve, reject) => {
+    if(hash !== 'undefined'){
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi?schoolId='+hash, false);  // `false` makes the request synchronous
+      xhr.send(null);
+      if(xhr.status == 200) {
+        let res = JSON.parse(xhr.response);
+        debug?console.log('get status: ', res):null
+        chrome.storage.local.set({status: true}, (e) => {
+          e? reject(e): resolve(hash);
+        });
+      }
+    } else {
+      reject(false);
+    }
+  });
+}
+
+get_hash = (schoolId) => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['hash'],  async (r) => {
+      if (r.hash) {
+        debug?console.log('hash exist'):null
+        resolve(r.hash);
+      }else{
+        debug?console.log("hash doesn't exist"):null
+        try{
+          hash = await sha256(schoolId);
+        } catch (e) {
+          console.log(e);
         }
-      });
-    }
-  }
+        resolve(hash);
+      }
+    });
+  });
 }
 
-hide = (array) => {
-    array.forEach(function (id) {
-        document.getElementById(id).style.display = 'none';
-    })
+get_local_data = (date) => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['data'],  (r) => {
+      if (r.data) {
+        resolve(r.data);
+      }else{
+        data = {
+          max_count: 1,
+          now_count: 1,
+          last_login: date,
+        }
+        resolve(data);
+      }
+    });
+  });
 }
 
-show = (array) => {
-    array.forEach(function (id) {
-        document.getElementById(id).style.display = 'block';
-    })
+get_local_status = () => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(['status'],  (r) => {
+      debug?console.log('local status: ', r):null
+      if(r.status){
+        resolve(true);
+      }else{
+        resolve(false);
+      }
+    });
+  });
+}
+
+set_local_data = (data) => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.set({data: data},  (e) => {
+      if (!e) {
+        if (!todaylogin) {
+          popup(data)
+          resolve(data);
+        }
+        // debug用
+        //clearStorage():null
+        resolve(data);
+      } else {
+        debug?console.error(date):null
+        reject(data)
+      }
+    });
+  });
 }
 
 getByXpath = (path) => {
@@ -128,7 +187,6 @@ popup = (data) => {
   let now_count = data.now_count;
   let max_count = data.max_count;
   let html = document.getElementById("copyright").innerHTML;
-  console.log(typeof(html), html);
   html = html + '<div class="popupModal1"> \
    <input type="radio" name="modalPop" id="pop11" checked/> \
    <label for="pop11"></label> \
@@ -154,57 +212,34 @@ main = async () => {
   let info = getByXpath('/html/body/table[1]/tbody/tr/td[2]/text()');
   const schoolId = info.data.split(' ')[3];
 
-  let hash = await chrome.storage.local.get(['hash'], async (r) => {
-    if (r.hash) {
-      console.log('hash exist', r.hash);
-      hash = r.hash;
-      return r.hash;
-    }else{
-      console.log("hash doesn't exist");
-      return await sha256(schoolId);
-    }
-  });
-  /*
-  * なんでか知らんが同期処理になってくれなくてキレそう
-  * ほんまjavascript嫌い
-  */
+  let hash = await get_hash(schoolId);
+  debug?console.log('returned hash', hash):null
 
   let date = new Date();
   date = date.getTime();
 
-  data = await chrome.storage.local.get(['data'], async (r) => {
-    if (r.data) {
-      data = r.data;
-    }else{
-      data = {
-        max_count: 1,
-        now_count: 1,
-        last_login: date,
-      }
-      data = data;
-    }
+  data = await get_local_data(date);
+  debug?console.log('get_local_data: ', data):null
 
-    data = await check_login(data, date)
-    join_rank(hash, data.max_count, data.now_count, data.last_login);
-    let status_flag = await get_status(hash);
-    if (status_flag) {
-      post_count(hash)
-    }
+  data = await check_login(data, date);
+  debug?console.log('check_login: ', data):null
 
-    await chrome.storage.local.set({data: data}, async (e) => {
-      if (!e) {
-        if (!todaylogin) {
-          await popup(data);
-        }
-        // debug用
-        //clearStorage();
-        //console.log("clear")
-      } else {
-        console.error(date);
-      }
-    });
-  });
+  join_rank(hash, data.max_count, data.now_count, data.last_login);
+
+  let status = await get_local_status();
+  let put_res = null;
+  if (status) {
+    put_res = await put_count(hash, data.max_count, data.now_count, data.last_login);
+    debug?console.log('put_count res: ', put_res):null
+  } else {
+    put_res = await get_status(hash);
+  }
+  debug?console.log('put_res: ', put_res):null
+
+  set_local_data(data);
+
 }
 
+const debug = true;
 let todaylogin = false;
 main();

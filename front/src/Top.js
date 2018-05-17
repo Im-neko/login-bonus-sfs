@@ -19,7 +19,7 @@ render () {
             iconClassNameRight="muidocs-icon-navigation-expand-more"
           />
           <center>
-          <Message />
+          <Message msg="β版なんやで"/>
           <Route exact path="/" component={Ranking} />
           <Route exact path="/login" component={Login} />
           <Footer />

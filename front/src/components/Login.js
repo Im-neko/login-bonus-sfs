@@ -68,25 +68,36 @@ export default class extends Component {
   }
 
   render () {
-    return (
-      <div className="login_container">
-        SFC-SFSのボタンからこのページに来ないとデータが反映されません．<br />
-        <Button
-          style={style}
-          variant="raised"
-          color="primary"
-          onClick={this.twitterAuth.bind(this)}>
-            twitterで認証する
-        </Button>
-        <br />
+    if (this.state.query.hash === undefined || this.state.query.hash === 'undefined'){
+      console.log(this.state.query.hash);
+      return (
+        <div>
+        SFC-SFSのページにあるボタンからこのページに来てください<br /><br />
+        入れてない人はchrome拡張を入れてくださいな<br />
+        <a href="https://chrome.google.com/webstore/detail/login-bonus-for-sfc-sfs/iklbklboadjpdghjedpbbmhdpkcippno">login bonus for SFC-SFS</a>
+        </div>
+      )
+    }else{
+      console.log(this.state.query.hash);
+      return (
+        <div className="login_container">
+          <Button
+            style={style}
+            variant="raised"
+            color="primary"
+            onClick={this.twitterAuth.bind(this)}>
+              twitterで認証する
+          </Button>
+          <br />
 
-        {(() => {
-            if (this.state.login) {
-              return <p><img alt='twitter icon' src={this.state.icon_url} /><br/>{this.state.user_name}での登録が完了しました</p>
-            }
-          })()}
+          {(() => {
+              if (this.state.login) {
+                return <p><img alt='twitter icon' src={this.state.icon_url} /><br/>{this.state.user_name}での登録が完了しました</p>
+              }
+            })()}
 
-      </div>
-    );
+        </div>
+      );
+    }
   }
 }

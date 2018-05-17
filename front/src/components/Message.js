@@ -11,7 +11,7 @@ export default class extends Component {
   render () {
     return (
       <div className="login_container">
-        β版なんやで
+        {this.props.msg}
       </div>
     );
   }
