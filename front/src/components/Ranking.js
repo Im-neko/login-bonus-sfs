@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import axios from 'axios';
 
 import * as apis from "../environment/environment";
-
+import Loader from "./Loader";
 
 export default class extends Component {
   constructor(props) {
     super(props);
-    this.state = {datas: []}
+    this.state = {datas: [], loader: true}
   }
 
   componentWillMount () {
@@ -29,6 +29,7 @@ export default class extends Component {
         list.push(<tr key={parseInt(i, 10)} ><th>{parseInt(i, 10)+1}</th><th>{data[i].max_count}</th><th>{data[i].username}</th><th>{data[i].last_login}</th></tr>);
       }
       this.setState({datas: list});
+      this.setState({loader: false});
     });
   }
 
@@ -36,6 +37,7 @@ export default class extends Component {
 
     return (
       <div className="ranking_container">
+      <Loader isActive={this.state.loader}/>
       <table border="1">
       <tbody>
         <tr>
