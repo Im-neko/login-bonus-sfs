@@ -72,6 +72,7 @@ export default class extends Component {
       <div className="login_container">
         SFC-SFSのボタンからこのページに来ないとデータが反映されません．<br />
         <Button
+          style={style}
           variant="raised"
           color="primary"
           onClick={this.twitterAuth.bind(this)}>
