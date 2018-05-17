@@ -117,7 +117,7 @@ join_rank = (hash, max_count, now_count, last_login) => {
   let html = document.getElementById('navigation').innerHTML;
   html = '\
   <div class="navi01"> \
-  <a href="https://sfc.login-ranking.work/#/login?hash='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login+'" target="_blank"> 連続ログインランキング戦に参加する </a>\
+  <a href="https://sfc.login-ranking.work/#/login?hash='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login+'" target="_blank"> 連続ログインランキング戦に参加する</a>\
   </div> \
   <br> \
   ' + html;
@@ -141,8 +141,7 @@ popup = (data) => {
      <div class="modalMain"> \
      <h2 class="modalTitle">ログインボーナス！</h2>\
       <p>連続ログイン '+ now_count +' 日目！</p> \
-      <p>最高連続ログイン '+ max_count +' 日!</p>\
-
+      <p>最高連続ログイン '+ max_count +' 日!</p> \
      </div> \
     </div> \
    </div> \
