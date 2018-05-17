@@ -1,10 +1,15 @@
 import React, { Component } from "react";
-import request from 'superagent'
+import axios from 'axios';
 import * as firebase from "firebase";
 import * as qs from "qs"
+import Button from '@material-ui/core/Button';
 
 import * as apis from "../environment/environment";
 
+
+const style = {
+  margin: 12,
+};
 
 export default class extends Component {
   constructor(props) {
@@ -27,14 +32,12 @@ export default class extends Component {
       now_count: this.state.query.now_count || 0,
       last_login: this.state.query.last_login || 0
     }
-
-    request
-      .post(url)
-      .send(data) // sends a JSON post body
-      .set('Content-Type', 'application/json')
-      .end((err, res) => {
-        // Calling the end function will send the request
-        err?console.error(err):console.log(res);
+    axios.post(url, data, {'Content-Type': 'application/json'})
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 
@@ -67,12 +70,21 @@ export default class extends Component {
   render () {
     return (
       <div className="login_container">
-        <button onClick={this.twitterAuth.bind(this)}>twitterで認証する</button><br />
+        SFC-SFSのボタンからこのページに来ないとデータが反映されません．<br />
+        <Button
+          variant="raised"
+          color="primary"
+          onClick={this.twitterAuth.bind(this)}>
+            twitterで認証する
+        </Button>
+        <br />
+
         {(() => {
             if (this.state.login) {
               return <p><img alt='twitter icon' src={this.state.icon_url} /><br/>{this.state.user_name}での登録が完了しました</p>
             }
           })()}
+
       </div>
     );
   }
