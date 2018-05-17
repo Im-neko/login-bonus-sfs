@@ -59,8 +59,8 @@ get_status = async (hash) => {
   console.log(hash)
   var xhr = new XMLHttpRequest();
   xhr.responseType = 'json';
-  xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi?schoolId='+hash);
-  xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+  await xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/userapi?schoolId='+hash);
+  await xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
   xhr.onreadystatechange = function() {
     if(xhr.readyState === 4 && xhr.status === 200) {
       let res = xhr.response;
@@ -116,7 +116,7 @@ getByXpath = (path) => {
 join_rank = (hash, max_count, now_count, last_login) => {
   let html = document.getElementById('navigation').innerHTML;
   html = '\
-  <div class="rnavi01"> \
+  <div class="navi01"> \
   <a href="https://sfc.login-ranking.work/#/login?hash='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login+'" target="_blank"> 連続ログインランキング戦に参加する </a>\
   </div> \
   <br> \
@@ -142,6 +142,7 @@ popup = (data) => {
      <h2 class="modalTitle">ログインボーナス！</h2>\
       <p>連続ログイン '+ now_count +' 日目！</p> \
       <p>最高連続ログイン '+ max_count +' 日!</p>\
+
      </div> \
     </div> \
    </div> \
@@ -197,8 +198,8 @@ main = async () => {
           await popup(data);
         }
         // debug用
-        // clearStorage();
-        // console.log("clear")
+        //clearStorage();
+        //console.log("clear")
       } else {
         console.error(date);
       }
