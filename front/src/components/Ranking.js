@@ -16,7 +16,12 @@ export default class extends Component {
       let data = res.data.data;
       data = data.map((data) => {
         let num = parseInt(data.last_login, 10);
-        data.last_login = new Date(num)+'';
+        let last_date = new Date(num);
+        data.last_login = last_date.getFullYear()+'/'
+                            +(('00'+(last_date.getMonth()+1)).slice(-2))+'/'
+                            +('00'+last_date.getDate()).slice(-2)+' '
+                            +('00'+last_date.getHours()).slice(-2)+':'
+                            +('00'+last_date.getMinutes()).slice(-2);
         return data;
       })
       console.log(data)
@@ -34,22 +39,28 @@ export default class extends Component {
   }
 
   render () {
-
-    return (
-      <div className="ranking_container">
-      <Loader isActive={this.state.loader}/>
-      <table border="1">
-      <tbody>
-        <tr>
-          <th>Rank</th>
-          <th>Count</th>
-          <th>UserName</th>
-          <th>LastLoginTime</th>
-        </tr>
-        {this.state.datas}
-      </tbody>
-      </table>
-      </div>
-    );
+    if (this.state.loader){
+      return (
+        <div className="ranking_container">
+          <Loader isActive={this.state.loader}/>
+        </div>
+      );
+    } else {
+      return (
+        <div className="ranking_container">
+        <table border="1">
+        <tbody>
+          <tr>
+            <th>Rank</th>
+            <th>Count</th>
+            <th>UserName</th>
+            <th>LastLogin</th>
+          </tr>
+          {this.state.datas}
+        </tbody>
+        </table>
+        </div>
+      );
+    }
   }
 }
