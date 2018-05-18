@@ -10,7 +10,7 @@ getday0000 = (date) => {
 sha256 = (text) => {
   return new Promise((resolve, reject) => {
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/sha256api', false);
+    xhr.open('POST', '', false);
     xhr.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
     xhr.send( 'text='+text );
     if(xhr.status == 200) {
@@ -20,6 +20,28 @@ sha256 = (text) => {
        chrome.storage.local.set({hash: hash},  (e) => {
         e? reject("setting error") : resolve(hash);
       });
+    }else{
+      reject("not found");
+    }
+  });
+}
+
+check_update = () => {
+  return new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/versionapi', false);
+    xhr.send(null);
+    if(xhr.status == 200) {
+      let res = JSON.parse(xhr.response);
+      let latest_version = res.data;
+      debug?console.log('latest version: ', latest_version):null
+      if (latest_version !== version) {
+        var flag = confirm("[Chrome拡張機能]login bonus for SFC-SFSの最新版が出ています \n ダウンロードページを開きますか？");
+        if( flag == true ) {
+            window.open('https://chrome.google.com/webstore/detail/login-bonus-for-sfc-sfs/iklbklboadjpdghjedpbbmhdpkcippno');
+        }
+      }
+      resolve(null)
     }else{
       reject("not found");
     }
@@ -187,23 +209,15 @@ popup = (data) => {
   let now_count = data.now_count;
   let max_count = data.max_count;
   let html = document.getElementById("copyright").innerHTML;
-  html = html + '<div class="popupModal1"> \
-   <input type="radio" name="modalPop" id="pop11" checked/> \
-   <label for="pop11"></label> \
-   <input type="radio" name="modalPop" id="pop12" /> \
-   <label for="pop12">CLOSE</label> \
-   <input type="radio" name="modalPop" id="pop13" /> \
-   <label for="pop13">×</label> \
-   <div class="modalPopup2"> \
-    <div class="modalPopup3"> \
-     <div class="modalMain"> \
-     <h2 class="modalTitle">ログインボーナス！</h2>\
-      <p>連続ログイン '+ now_count +' 日目！</p> \
-      <p>最高連続ログイン '+ max_count +' 日!</p> \
-     </div> \
-    </div> \
-   </div> \
-  </div>';
+  html = html + '<!-- ここからモーダルウィンドウ --> \
+  <div id="modal-content"> \
+  	<!-- モーダルウィンドウのコンテンツ開始 --> \
+  	<p>モーダルウィンドウのコンテンツをHTMLで自由に編集することができます。画像や、動画埋め込みなど、お好きなものを入れて下さい。</p> \
+  	<p>「閉じる」か「背景」をクリックするとモーダルウィンドウを終了します。</p> \
+  	<p><a id="modal-close" class="button-link">閉じる</a></p> \
+  	<!-- モーダルウィンドウのコンテンツ終了 --> \
+  </div> \
+  <p><a id="modal-open" class="button-link">クリックするとモーダルウィンドウを開きます。</a></p>;/'
   document.getElementById("copyright").innerHTML = html;
 }
 
@@ -237,9 +251,11 @@ main = async () => {
   debug?console.log('put_res: ', put_res):null
 
   set_local_data(data);
+  await check_update();
 
 }
 
 const debug = true;
+const version = '1.1.3';
 let todaylogin = false;
 main();
