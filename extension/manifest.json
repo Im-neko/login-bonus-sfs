@@ -5,11 +5,17 @@
     "permissions": ["storage", "declarativeContent"],
     "content_scripts": [
       {
-        "matches": ["https://vu.sfc.keio.ac.jp/sfc-sfs/portal_s/s01.cgi?*&mode=0*"],
+        "matches": ["https://vu.sfc.keio.ac.jp/sfc-sfs/portal_s/s01.cgi?*&mode=0"],
         "css": ["css/mystyle.css"],
         "js": ["js/myscript.js"]
       }
     ],
+    "icons":{
+      "128": "icon128.png",
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "64": "icon64.png"
+    },
     "browser_action": {
       "default_popup": "popup.html"
     },
