@@ -26,27 +26,6 @@ sha256 = (text) => {
   });
 }
 
-check_update = () => {
-  return new Promise((resolve, reject) => {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://us-central1-sfs-login-bonus.cloudfunctions.net/versionapi', false);
-    xhr.send(null);
-    if(xhr.status == 200) {
-      let res = JSON.parse(xhr.response);
-      let latest_version = res.data;
-      debug?console.log('latest version: ', latest_version):null
-      if (latest_version !== version) {
-        var flag = confirm("[Chrome拡張機能]login bonus for SFC-SFSの最新版が出ています \n ダウンロードページを開きますか？");
-        if( flag == true ) {
-            window.open('https://chrome.google.com/webstore/detail/login-bonus-for-sfc-sfs/iklbklboadjpdghjedpbbmhdpkcippno');
-        }
-      }
-      resolve(null)
-    }else{
-      reject("not found");
-    }
-  });
-}
 
 clearStorage = () => {
   return chrome.storage.local.clear(function (r) {
@@ -251,11 +230,10 @@ main = async () => {
   debug?console.log('put_res: ', put_res):null
 
   set_local_data(data);
-  await check_update();
 
 }
 
-const debug = true;
-const version = '1.1.3';
+const debug = false;
+const version = '1.1.4';
 let todaylogin = false;
 main();

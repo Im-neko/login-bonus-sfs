@@ -1,6 +1,6 @@
   {
     "name": "login bonus for SFC-SFS",
-    "version": "1.1.3",
+    "version": "1.1.4.1",
     "description": "Enchanting login bonus to SFC-SFS",
     "permissions": ["storage", "declarativeContent"],
     "content_scripts": [
