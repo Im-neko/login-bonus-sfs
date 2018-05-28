@@ -174,15 +174,52 @@ getByXpath = (path) => {
   return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
+//
+function createXmlHttpRequest()
+{
+    var xmlhttp=null;
+    if(window.ActiveXObject)
+    {
+        try
+        {
+            xmlhttp=new ActiveXObject("Msxml2.XMLHTTP");
+        }
+        catch(e)
+        {
+            try
+            {
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            catch (e2)
+            {
+            }
+        }
+    }
+    else if(window.XMLHttpRequest)
+    {
+        xmlhttp = new XMLHttpRequest();
+    }
+    return xmlhttp;
+}
+
 join_rank = (hash, max_count, now_count, last_login) => {
-  let html = document.getElementById('navigation').innerHTML;
-  html = '\
-  <div class="navi01"> \
-  <a href="https://sfc.login-ranking.work/#/login?hash='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login+'" target="_blank"> 連続ログインランキング戦に参加する</a>\
-  </div> \
-  <br> \
-  ' + html;
-  document.getElementById('navigation').innerHTML = html;
+    //判定php呼び出し
+    var xhr = new XMLHttpRequest();
+    //var xmlhttp=createXmlHttpRequest();
+    xhr.open("GET", "https://oops.okin-jp.net/sfs_check.php", false);
+    xhr.send(null);
+    var resrh=xhr.responseText;
+    //判定php呼び出し終わり(学内からのアクセス/学内からのアクセス(CNS)/学外からのアクセス)
+    //HTML
+    let html = document.getElementById('navigation').innerHTML;
+    html = '\
+    <div class="navi01"> \
+    <a href="https://sfc.login-ranking.work/#/login?hash='+hash+'&max_count='+max_count+'&now_count='+now_count+'&last_login='+last_login+'" target="_blank"> 連続ログインランキング戦に参加する</a></div><div class="navi01">\
+    '+ resrh + '</div>\
+      <br> \
+    '+ html ;
+    //HTML書き換え終了
+    document.getElementById('navigation').innerHTML = html;
 }
 
 popup = (data) => {
