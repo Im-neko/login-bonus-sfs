@@ -54,6 +54,7 @@ export default class extends Component {
     firebase.initializeApp(config);
     var provider = new firebase.auth.TwitterAuthProvider();
     firebase.auth().signInWithPopup(provider).then((result) => {
+      console.log(result)
       this.setState({
         idToken: result.user.uid,
         user_name: result.additionalUserInfo.profile.name,
